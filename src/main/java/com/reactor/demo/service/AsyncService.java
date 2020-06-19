@@ -102,26 +102,40 @@ public class AsyncService {
             ClassInfo classInfo = new ClassInfo(i);
             classInfos.add(classInfo);
         }
+
         Mono<List<ClassInfo>> classNameMono = Flux.fromStream(classInfos.stream())
                 .flatMap(classInfo -> {
                     return Mono.fromSupplier(() -> {
-                        String className = getClassName(classInfo.getClassId());
+                        return getClassName(classInfo.getClassId());
+                    }).map((className) -> {
                         classInfo.setClassName(className);
                         return classInfo;
-                    }).subscribeOn(Schedulers.elastic());
+                    })      // 真正并发是因为这里订阅到弹性线程了
+                            .subscribeOn(Schedulers.elastic());
                 }).collectList();
 
         Mono<List<ClassInfo>> teacherNameMono = Flux.fromStream(classInfos.stream())
                 .flatMap(classInfo -> {
                     return Mono.fromSupplier(() -> {
-                        String teacherName = getClassTeacherName(classInfo.getClassId());
+                        return getClassTeacherName(classInfo.getClassId());
+                    }).map((teacherName) -> {
                         classInfo.setTeacherName(teacherName);
                         return classInfo;
                     }).subscribeOn(Schedulers.elastic());
                 }).collectList();
+
+        Mono<List<ClassInfo>> studentNumMono = Flux.fromStream(classInfos.stream())
+                .flatMap(classInfo -> {
+                    return Mono.fromSupplier(() -> {
+                        return getClassStudentTotal(classInfo.getClassId());
+                    }).map((studentNum) -> {
+                        classInfo.setStudentTotal(studentNum);
+                        return classInfo;
+                    }).subscribeOn(Schedulers.elastic());
+                }).collectList();
 //
-        Mono.zip(classNameMono, teacherNameMono)
-                .subscribeOn(Schedulers.elastic())
+        Mono.zip(classNameMono, teacherNameMono, studentNumMono)
+//                .subscribeOn(Schedulers.elastic())
                 .block();
         return classInfos;
     }
@@ -155,7 +169,7 @@ public class AsyncService {
 //        ClassInfo classInfo = fillClassInfo();
         List<ClassInfo> classInfos = getClassInfos();
         log.info("result:{}", classInfos);
-        log.info("cost time:{}",System.currentTimeMillis() - startTime);
+        log.info("cost time:{}", System.currentTimeMillis() - startTime);
     }
 
 
