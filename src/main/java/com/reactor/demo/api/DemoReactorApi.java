@@ -159,14 +159,21 @@ public class DemoReactorApi {
 
     public static void main(String[] args) {
 //        createFluxFromExistingData();
+//        System.out.println("----------");
 //        createFluxWithProgram();
 //        createMonoAsync();
 //        createMonoFromExistingData();
 //        mapVsFlatMap();
 //        useFilter();
 //        useThenFlow();
-        monoFluxInterchange();
+//        monoFluxInterchange();
 //        zipMonoOrFlux();
+
+        String content = "<html lang='zh-CN'><head><meta charset='utf-8'>"
+                + "</head><body>老师好,您在双师管理后台下载的子班讲次出勤数据已经处理完成，请您<a href='%s'>点此</a>进行下载。（链接有效期为一天，过期后请您重新去平台操作下载）"
+                + "</body></html>";
+        String url = "https://shuangshi-excel-1255817909.cos.ap-beijing.myqcloud.com/folder/dev/%E5%AD%90%E7%8F%AD%E6%B1%87%E6%80%BB%E6%95%B0%E6%8D%AE_20200628212011_123.xlsx?sign=q-sign-algorithm%3Dsha1%26q-ak%3DAKIDl8G9mS862xiDSU7fPt2wZxUlmY3IqnBI%26q-sign-time%3D1593494646%3B1593498246%26q-key-time%3D1593494646%3B1593498246%26q-header-list%3D%26q-url-param-list%3D%26q-signature%3D45fecef6c05da9a0dd0385cdae162787f271775c";
+        String format = String.format(content, url);
     }
 
 
